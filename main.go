@@ -181,8 +181,8 @@ func (r *Renderer) Render(img image.Image) string {
 	var output strings.Builder
 	
 	// Process the image by 2x2 blocks (representing one character cell)
-	for y := 0; y < outHeight*2; y += 2 {
-		for x := 0; x < outWidth*2; x += 2 {
+	for y := 0; y < outHeight * 2; y += 2 {
+		for x := 0; x < outWidth * 2; x += 2 {
 			// Create and analyze the 2x2 pixel block
 			block := r.createPixelBlock(scaledImg, x, y)
 			
@@ -485,17 +485,17 @@ func (r *Renderer) applyDithering(img image.Image) image.Image {
 			oldA8 := uint8(oldA >> 8)
 			
 			// Quantize to nearest color in palette
-			newR8 := uint8(math.Round(float64(oldR8*levels)/255) * (255.0 / float64(levels)))
-			newG8 := uint8(math.Round(float64(oldG8*levels)/255) * (255.0 / float64(levels)))
-			newB8 := uint8(math.Round(float64(oldB8*levels)/255) * (255.0 / float64(levels)))
+			newR8 := uint8(math.Round(float64(int(oldR8)*int(levels))/255) * (255.0 / float64(levels)))
+			newG8 := uint8(math.Round(float64(int(oldG8)*int(levels))/255) * (255.0 / float64(levels)))
+			newB8 := uint8(math.Round(float64(int(oldB8)*int(levels))/255) * (255.0 / float64(levels)))
 			
 			// Set the new color
 			result.Set(x, y, color.RGBA{newR8, newG8, newB8, oldA8})
 			
 			// Calculate error
-			errR := int(oldR8) - int(newR8)
-			errG := int(oldG8) - int(newG8)
-			errB := int(oldB8) - int(newB8)
+			errR := oldR8 - newR8
+			errG := oldG8 - newG8
+			errB := oldB8 - newB8
 			
 			// Distribute error to neighboring pixels
 			dither := func(dx, dy int, factor float64) {
@@ -610,13 +610,13 @@ func nearestAnsi256Color(r, g, b uint8) int {
 		}
 		
 		// Use grayscale ramp 232-255
-		return 232 + (r-8)/10
+		return 232 + (int(r)-8)/10
 	}
 	
 	// Quantize to the 6x6x6 color cube (16-231)
-	rIdx := (r * 6) / 256
-	gIdx := (g * 6) / 256
-	bIdx := (b * 6) / 256
+	rIdx := (int(r) * 6) / 256
+	gIdx := (int(g) * 6) / 256
+	bIdx := (int(b) * 6) / 256
 	
 	return 16 + 36*rIdx + 6*gIdx + bIdx
 }
