@@ -10,7 +10,6 @@ import (
 	_ "image/png"
 	"math"
 	"os"
-	"strconv"
 	"strings"
 )
 
@@ -21,8 +20,8 @@ type Block struct {
 	CoverageMap  string // Visual representation of coverage for debugging
 }
 
-// RendererOptions contains all configurable settings
-type RendererOptions struct {
+// EncoderOptions contains all configurable settings
+type EncoderOptions struct {
 	ColorMode    int     // 0=none, 1=8colors, 2=256colors, 3=truecolor
 	Width        int     // Output width
 	Height       int     // Output height (0 for auto)
@@ -45,8 +44,8 @@ type PixelBlock struct {
 }
 
 // DefaultOptions returns the default rendering options
-func DefaultOptions() RendererOptions {
-	return RendererOptions{
+func DefaultOptions() EncoderOptions {
+	return EncoderOptions{
 		ColorMode:    3,         // Truecolor
 		Width:        80,        // Default width
 		Height:       0,         // Auto height
@@ -105,12 +104,12 @@ func NewBlocks(symbolsOption string) []Block {
 
 // Renderer handles the image-to-terminal conversion
 type Renderer struct {
-	Options RendererOptions
+	Options EncoderOptions
 	Blocks  []Block
 }
 
-// NewRenderer creates a new renderer with the given options
-func NewRenderer(options RendererOptions) *Renderer {
+// Encode creates a new renderer with the given options
+func Encode(options EncoderOptions) *Renderer {
 	return &Renderer{
 		Options: options,
 		Blocks:  NewBlocks(options.Symbols),
@@ -644,7 +643,7 @@ func main() {
 	}
 	
 	// Create options
-	options := RendererOptions{
+	options := EncoderOptions{
 		ColorMode:    *colorMode,
 		Width:        *width,
 		Height:       *height,
@@ -657,7 +656,7 @@ func main() {
 	}
 	
 	// Create renderer
-	renderer := NewRenderer(options)
+	renderer := Encode(options)
 	
 	// Render and output
 	result, err := renderer.RenderFile(*filePath)
